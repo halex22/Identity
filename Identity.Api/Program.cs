@@ -34,6 +34,8 @@ namespace Identity.Api
 
 
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IRequestService, RquestService>();
+            builder.Services.AddScoped<IRoleService, RoleService>();
             // Add services to the container.
 
             builder.Services.AddControllers();

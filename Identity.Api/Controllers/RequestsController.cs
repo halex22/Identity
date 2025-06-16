@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Identity.Api.Model;
 using Identity.Service.Model;
+using Identity.Api.Service.Interfaces;
+using Identity.Api.Model.DTOs;
 
 namespace Identity.Api.Controllers
 {
@@ -15,10 +17,12 @@ namespace Identity.Api.Controllers
     public class RequestsController : ControllerBase
     {
         private readonly IdentityContext _context;
+        private readonly IRequestService _service;
 
-        public RequestsController(IdentityContext context)
+        public RequestsController(IdentityContext context, IRequestService service)
         {
             _context = context;
+            _service = service;
         }
 
         // GET: api/Requests
@@ -76,12 +80,19 @@ namespace Identity.Api.Controllers
         // POST: api/Requests
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Request>> PostRequest(Request request)
+        public async Task<IActionResult> PostRequest(RawRequestDTO request)
         {
-            _context.Requests.Add(request);
-            await _context.SaveChangesAsync();
+            try
+            {
+                var createdRequest = await _service.CreateRequest(request);
+                return CreatedAtAction("GetRequest", new { id = createdRequest.Id }, createdRequest.Id);
 
-            return CreatedAtAction("GetRequest", new { id = request.Id }, request);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
         }
 
         // DELETE: api/Requests/5

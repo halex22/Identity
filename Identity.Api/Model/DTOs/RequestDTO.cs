@@ -8,7 +8,7 @@ namespace Identity.Api.Model.DTOs
         public DateTime CreatedAt { get; set; }
         public DateTime? ExecutedAt { get; set; }
         public bool? Success { get; set; }
-        public string ErrorMessage { get; set; } = string.Empty;
+        public string? ErrorMessage { get; set; }
         public int UserId { get; set; }
 
     }

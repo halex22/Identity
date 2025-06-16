@@ -18,14 +18,21 @@ namespace Identity.Api.Service
         {
             var newRequest = new Request
             {
-                CreatedAt = DateTime.UtcNow,
                 ExecutedAt = request.ExecutedAt ?? null,
                 Success = request.Success ?? null,
                 ErrorMessage = request.ErrorMessage ?? string.Empty,
                 UserId = request.UserId
             };
             _context.Requests.Add(newRequest);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
 
             return new RequestDTO
             {
@@ -35,7 +42,7 @@ namespace Identity.Api.Service
                 Success = newRequest.Success,
                 ErrorMessage = newRequest.ErrorMessage,
                 UserId = newRequest.UserId
-            };  
+            };
         }
 
         public Task DeleteRequest(int id)
@@ -56,11 +63,19 @@ namespace Identity.Api.Service
             }).ToList());
         }
 
-        public Task<RequestDTO> GetRequestById(int id)
+        public async Task<RequestDTO> GetRequestById(int id)
         {
-            //var request = _context.Requests.FindAsync(id);
-            //if (request == null) throw new KeyNotFoundException($"Request with ID {id} not found.");
-            throw new NotImplementedException("Method not implemented yet.");
+            var request = await _context.Requests.FindAsync(id);
+            if (request == null) throw new KeyNotFoundException($"Request with ID {id} not found.");
+            return new RequestDTO
+            {
+                CreatedAt = request.CreatedAt,
+                Id = request.Id,
+                ErrorMessage = request.ErrorMessage,
+                ExecutedAt = request.ExecutedAt,
+                UserId = request.UserId,
+                Success = request.Success
+            };
         }
 
         public Task<RequestDTO> UpdateRequest(RequestDTO request)

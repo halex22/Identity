@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Service.Model
 {
-    public class IdentityContext: DbContext
+    public class IdentityContext : DbContext
     {
         public IdentityContext(DbContextOptions<IdentityContext> options) : base(options)
         {
@@ -17,6 +17,7 @@ namespace Identity.Service.Model
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Request> Requests { get; set; } = null!;
         public DbSet<Role> Roles { get; set; } = null!;
+        public DbSet<UserRole> UserRoles { get; set; } = null!;
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -69,9 +70,20 @@ namespace Identity.Service.Model
             modelBuilder.Entity<Role>().HasKey(r => r.Id);
             modelBuilder.Entity<Role>().Property(r => r.Type).IsRequired().HasMaxLength(25);
 
-            modelBuilder.Entity<User>().HasMany(u => u.Roles)
-                .WithMany(r => r.Users)
-                .UsingEntity(j => j.ToTable("user_roles"));
+
+            modelBuilder.Entity<UserRole>()
+                .ToTable("user_roles")
+                .HasKey(ur => new { ur.UserId, ur.RoleId });
+
+            modelBuilder.Entity<UserRole>().HasOne(ur => ur.User)
+                .WithMany(u => u.UserRole)
+                .HasForeignKey(ur => ur.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UserRole>().HasOne(ur => ur.Role)
+                .WithMany(r => r.UserRoles)
+                .HasForeignKey(ur => ur.RoleId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
