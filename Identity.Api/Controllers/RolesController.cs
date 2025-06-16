@@ -16,12 +16,10 @@ namespace Identity.Api.Controllers
     [ApiController]
     public class RolesController : ControllerBase
     {
-        private readonly IdentityContext _context;
         private readonly IRoleService _service;
 
-        public RolesController(IdentityContext context, IRoleService service)
+        public RolesController(IRoleService service)
         {
-            _context = context;
             _service = service;
         }
 
@@ -51,7 +49,19 @@ namespace Identity.Api.Controllers
 
         // GET: api/Roles/1/User
         // tutti gli utenti che hanno il role 1
-        //[HttpGet("{id}")]
+        [HttpGet("{id}/users")]
+        public async Task<IActionResult> GetUsersByRoleId([FromRoute]int id)
+        {
+            try
+            {
+                var users = await _service.GetUsersByRoleId(id);
+                return Ok(users);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
 
         // PUT: api/Roles/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -97,21 +107,20 @@ namespace Identity.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRole(int id)
         {
-            var role = await _context.Roles.FindAsync(id);
-            if (role == null)
+            try
             {
-                return NotFound();
+                var deletedRoleId = await _service.DeleteUserRole(id);
+                return Ok(deletedRoleId);
             }
-
-            _context.Roles.Remove(role);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        private bool RoleExists(int id)
-        {
-            return _context.Roles.Any(e => e.Id == id);
-        }
     }
 }

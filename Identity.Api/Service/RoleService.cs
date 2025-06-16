@@ -81,7 +81,7 @@ namespace Identity.Api.Service
         {
             try
             {
-                var entity = await FindSingleRole(role.Id);
+                var entity = await FindSingleRoleAsync(role.Id);
                 if (!string.IsNullOrWhiteSpace(role.Type)) entity.Type = role.Type;
                 await _context.SaveChangesAsync();
                 return entity.Id;
@@ -96,7 +96,7 @@ namespace Identity.Api.Service
             }
         }
 
-        private async Task<Role> FindSingleRole(int roleId)
+        private async Task<Role> FindSingleRoleAsync(int roleId)
         {
             var role = await _context.Roles.SingleOrDefaultAsync(r => r.Id == roleId);
             if (role == null)

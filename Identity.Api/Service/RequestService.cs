@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Api.Service
 {
-    public class RquestService : IRequestService
+    public class RequestService : IRequestService
     {
         private readonly IdentityContext _context;
 
-        public RquestService(IdentityContext context)
+        public RequestService(IdentityContext context)
         {
             _context = context;
         }
