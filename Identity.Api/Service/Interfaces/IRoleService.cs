@@ -6,9 +6,11 @@ namespace Identity.Api.Service.Interfaces
     public interface IRoleService
     {
         Task<List<Role>> GetAllRoles();
-        Task DeleteUserRole(int id);
+        Task<int> DeleteUserRole(int id);
         Task<Role> GetRoleById(int id);
-        Task<UserDTO> GetUserByRoleId(int id);
+        Task<List<UserDTO>> GetUsersByRoleId(int id);
+        Task<int> UpdateRole(Role role);
+        Task<Role> createRole(RawRole role);
 
     }
 }

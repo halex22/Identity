@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Identity.Api.Model;
 using Identity.Service.Model;
 using Identity.Api.Service.Interfaces;
+using Identity.Api.Model.DTOs;
 
 namespace Identity.Api.Controllers
 {
@@ -57,41 +58,39 @@ namespace Identity.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutRole([FromRoute]int id, [FromBody]Role role)
         {
-            if (id != role.Id)
-            {
-                return BadRequest();
-            }
+            if (id != role.Id) return BadRequest();
 
-            _context.Entry(role).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                var updatedRole = await _service.UpdateRole(role);
+                return Ok(updatedRole);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (KeyNotFoundException ex)
             {
-                if (!RoleExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound(ex);
+            }
+            catch (InvalidOperationException ex)
+            {
+
+                    return BadRequest(ex);
             }
 
-            return NoContent();
         }
 
         // POST: api/Roles
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Role>> PostRole(Role role)
+        public async Task<IActionResult> PostRole([FromBody] RawRole role)
         {
-            _context.Roles.Add(role);
-            await _context.SaveChangesAsync();
+            if (string.IsNullOrWhiteSpace(role.Type))
+            {
+                return BadRequest("Role type cannot be null or empty.");
+            }
 
-            return CreatedAtAction("GetRole", new { id = role.Id }, role);
+            var createdRole = await _service.createRole(role);
+
+            return CreatedAtAction("GetRole", new { id = createdRole.Id }, createdRole);
         }
 
         // DELETE: api/Roles/5
