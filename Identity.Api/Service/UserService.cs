@@ -1,4 +1,5 @@
-﻿using Identity.Api.Model.DTOs;
+﻿using Identity.Api.Model;
+using Identity.Api.Model.DTOs;
 using Identity.Api.Service.Interfaces;
 using Identity.Model;
 using Identity.Service.Model;
@@ -70,6 +71,20 @@ namespace Identity.Api.Service
                     LastName = user.LastName,
                     Email = user.Email
                 };
+        }
+
+        public async Task<List<Role>> GetUserRoles(int id)
+        {
+            var user = await _context.Users.Include(u => u.UserRole)
+                .ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(u => u.Id == id);
+            // note to self: first get 1 even if more than one
+            // single if more than one exeption gets triggered
+            if (user == null)
+            {
+                throw new KeyNotFoundException($"User with ID {id} not found.");
+            }
+            return user.UserRole.Select(ur => ur.Role).ToList();
         }
 
         public Task<UserDTO> UpdateUser(UserDTO user)

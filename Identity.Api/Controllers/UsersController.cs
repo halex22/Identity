@@ -47,6 +47,21 @@ namespace Identity.Api.Controllers
             }
 
         }
+        //// GET: api/users/1/roles
+        // tutti i roli che ha l'utente 1
+        [HttpGet("{id}/roles")]
+        public async Task<IActionResult> GetUserRoles(int id)
+        {
+            try
+            {
+                var roles = await _service.GetUserRoles(id);
+                return Ok(roles);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound($"User with ID {id} not found.");
+            }
+        }
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

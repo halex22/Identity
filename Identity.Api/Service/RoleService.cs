@@ -1,4 +1,5 @@
 ﻿using Identity.Api.Model;
+using Identity.Api.Model.DTOs;
 using Identity.Api.Service.Interfaces;
 using Identity.Service.Model;
 using Microsoft.AspNetCore.Identity;
@@ -26,7 +27,7 @@ namespace Identity.Api.Service
             throw new NotImplementedException();
         }
 
-        public async Task<List<Role>> GetAllUserRoles()
+        public async Task<List<Role>> GetAllRoles()
         {
            return await _context.Roles.ToListAsync();
         }
@@ -39,6 +40,13 @@ namespace Identity.Api.Service
                 throw new KeyNotFoundException($"Role with ID {id} not found.");
             }
             return role;
+        }
+
+        public async Task<UserDTO> GetUserByRoleId(int id)
+        {
+            var roleUsers = await _context.Roles
+                .Include(r => r.UserRoles)
+                .FirstOrDefaultAsync(r => r.Id == id);
         }
     }
 }

@@ -27,9 +27,10 @@ namespace Identity.Api.Controllers
 
         // GET: api/Requests
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Request>>> GetRequests()
+        public async Task<IActionResult> GetRequests()
         {
-            return await _context.Requests.ToListAsync();
+            var result = await _service.GetAllRequests();
+            return Ok(result);
         }
 
         // GET: api/Requests/5

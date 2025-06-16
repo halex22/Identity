@@ -26,24 +26,31 @@ namespace Identity.Api.Controllers
 
         // GET: api/Roles
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Role>>> GetRoles()
+        public async Task<IActionResult> GetRoles()
         {
-            return await _context.Roles.ToListAsync();
+            var roles = await _service.GetAllRoles();
+            return Ok(roles);
         }
 
         // GET: api/Roles/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Role>> GetRole([FromRoute]int id)
         {
-            var role = await _context.Roles.FindAsync(id);
-
-            if (role == null)
+            try
             {
-                return NotFound();
+                var role = await _service.GetRoleById(id);
+                return Ok(role);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound($"Role with ID {id} not found.");
             }
 
-            return role;
         }
+
+        // GET: api/Roles/1/User
+        // tutti gli utenti che hanno il role 1
+        //[HttpGet("{id}")]
 
         // PUT: api/Roles/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
